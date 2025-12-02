@@ -15,5 +15,23 @@ with open("dane.json", "w") as data:
     data.write(json.dumps(job_offers, indent=1))
 with open("dane.json", "r") as data:
     job_offers = json.load(data)
-for cos in job_offers[0]:
-    print(f"{cos}: {job_offers[0][cos]}")
+for job in range(len(job_offers)):
+    cos = job_offers[job]
+    print(cos)
+    print(f"Tytuł: {cos['jobTitle']}")
+    print(f"Widełki płacowe: {cos['salaryDisplayText']}")
+    print("LOKALIZACJA:")
+    if not cos['isRemoteWorkAllowed']:
+        for offer in range(len(cos['offers'])):
+            for city in cos['offers'][offer]['displayWorkplace'].replace(" ","").split(","):
+                print(city)
+            print(len(cos['offers']))
+    else: print("zdalna")
+    print("TECHNOLOGIE:", "nie podano" if len(cos['technologies']) == 0 else "")
+    for technology in range(len(cos['technologies'])):
+        print(cos['technologies'][technology])
+    print("POZYCJE:")
+    print(cos['positionLevels'])
+    for position in range(len(cos['positionLevels'])):
+        print(cos['positionLevels'][position])
+    print()
