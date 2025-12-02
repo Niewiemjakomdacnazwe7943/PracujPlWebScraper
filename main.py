@@ -2,6 +2,7 @@ import json
 from selenium import webdriver
 from time import sleep
 from bs4 import BeautifulSoup
+from math import floor
 
 website_link = 'https://it.pracuj.pl/praca?et=17%2C4%2C18&sal=1&sc=0&wm=home-office%2Cfull-office%2Chybrid'
 chrome_driver = webdriver.Chrome()
@@ -16,22 +17,32 @@ with open("dane.json", "w") as data:
 with open("dane.json", "r") as data:
     job_offers = json.load(data)
 for job in range(len(job_offers)):
-    cos = job_offers[job]
-    print(cos)
-    print(f"Tytuł: {cos['jobTitle']}")
-    print(f"Widełki płacowe: {cos['salaryDisplayText']}")
+    the_job = job_offers[job]
+    print(the_job)
+    print(f"Tytuł: {the_job['jobTitle']}")
+    salary_display_text = the_job["salaryDisplayText"]
+    salary_string = salary_display_text.replace("\xa0", "").replace(" ", "")
+    salary_range = salary_string.split("zł")
+    if len(salary_range[0].split("–")) == 1:
+        min_max_pay = [salary_range[0].split("–")[0], salary_range[0].split("–")[0]]
+    else:
+        min_max_pay = [salary_range[0].split("–")[0], salary_range[0].split("–")[1]]
+    if "godz" in salary_string:
+        min_max_pay[0] = floor(float(min_max_pay[0]) * 173.3)
+        min_max_pay[1] = floor(float(min_max_pay[1]) * 173.3)
+    print(f"Widełki płacowe: {min_max_pay[0]}-{min_max_pay[1]}zł")
     print("LOKALIZACJA:")
-    if not cos['isRemoteWorkAllowed']:
-        for offer in range(len(cos['offers'])):
-            for city in cos['offers'][offer]['displayWorkplace'].replace(" ","").split(","):
+    if not the_job['isRemoteWorkAllowed']:
+        for offer in range(len(the_job['offers'])):
+            for city in the_job['offers'][offer]['displayWorkplace'].replace(" ", "").split(","):
                 print(city)
-            print(len(cos['offers']))
-    else: print("zdalna")
-    print("TECHNOLOGIE:", "nie podano" if len(cos['technologies']) == 0 else "")
-    for technology in range(len(cos['technologies'])):
-        print(cos['technologies'][technology])
+            print(len(the_job['offers']))
+    else:
+        print("zdalna")
+    print("TECHNOLOGIE:", "nie podano" if len(the_job['technologies']) == 0 else "")
+    for technology in range(len(the_job['technologies'])):
+        print(the_job['technologies'][technology])
     print("POZYCJE:")
-    print(cos['positionLevels'])
-    for position in range(len(cos['positionLevels'])):
-        print(cos['positionLevels'][position])
+    for position in range(len(the_job['positionLevels'])):
+        print(the_job['positionLevels'][position])
     print()
