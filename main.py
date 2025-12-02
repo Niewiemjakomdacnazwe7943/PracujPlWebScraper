@@ -10,4 +10,6 @@ website_soup = BeautifulSoup(chrome_driver.page_source, "html.parser")
 website_script = website_soup.find("script", {"id": "__NEXT_DATA__", "type": "application/json"}).text
 chrome_driver.quit()
 website_json = json.loads(website_script)
-print(website_json['props']['pageProps']['dehydratedState']['queries'][0]['state']['data'])
+job_offers = website_json['props']['pageProps']['dehydratedState']['queries'][0]['state']['data']['groupedOffers']
+with open("dane.json", "w") as data:
+    data.write(json.dumps(job_offers, indent=2))
