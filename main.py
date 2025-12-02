@@ -12,4 +12,8 @@ chrome_driver.quit()
 website_json = json.loads(website_script)
 job_offers = website_json['props']['pageProps']['dehydratedState']['queries'][0]['state']['data']['groupedOffers']
 with open("dane.json", "w") as data:
-    data.write(json.dumps(job_offers, indent=2))
+    data.write(json.dumps(job_offers, indent=1))
+with open("dane.json", "r") as data:
+    job_offers = json.load(data)
+for cos in job_offers[0]:
+    print(f"{cos}: {job_offers[0][cos]}")
