@@ -24,7 +24,7 @@ for job in range(len(job_offers)):
     print(the_job)
     print(f"Tytuł: {the_job['jobTitle']}")
     salary_display_text = the_job["salaryDisplayText"]
-    salary_string = salary_display_text.replace("\xa0", "").replace(" ", "")
+    salary_string = salary_display_text.replace("\xa0", "").replace(" ", "").replace(",", ".")
     salary_range = salary_string.split("zł")
     if len(salary_range[0].split("–")) == 1:
         min_max_pay = [salary_range[0].split("–")[0], salary_range[0].split("–")[0]]
