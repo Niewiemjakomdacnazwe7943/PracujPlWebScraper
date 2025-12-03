@@ -13,8 +13,6 @@ chrome_driver.quit()
 website_json = json.loads(website_script)
 job_offers = website_json['props']['pageProps']['dehydratedState']['queries'][0]['state']['data']['groupedOffers']
 jobs_found_amount = website_json['props']['pageProps']['dehydratedState']['queries'][0]['state']['data']['groupedOffersTotalCount']
-pages = ceil(jobs_found_amount / 50)
-page_number = 2
 with open("dane.json", "w") as data:
     data.write(json.dumps(job_offers, indent=1))
 with open("dane.json", "r") as data:
