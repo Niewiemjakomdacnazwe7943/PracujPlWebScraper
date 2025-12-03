@@ -34,6 +34,8 @@ def prepare_salary_range(salary_text):
     salary_range = salary_string.split("zł")
     if len(salary_range[0].split("–")) == 1:
         min_max_pay = [salary_range[0].split("–")[0], salary_range[0].split("–")[0]]
+        # TO DO: zobaczyc jaki to jest typ w tej liscie min_max_pay
+        # TO DO: zmienic to na 1 element
     else:
         min_max_pay = [salary_range[0].split("–")[0], salary_range[0].split("–")[1]]
     if "godz" in salary_string:
@@ -75,3 +77,4 @@ job_offers = current_save[0]
 jobs_found_amount = current_save[1]
 print_data_to_console(job_offers)
 print(jobs_found_amount)
+# TO DO: Pokazać Tobiaszowi ile jest technologii łącznie (najpierw list i set)
