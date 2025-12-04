@@ -33,14 +33,15 @@ def prepare_salary_range(salary_text):
     salary_string = salary_text.replace("\xa0", "").replace(" ", "").replace(",", ".")
     salary_range = salary_string.split("zł")
     if len(salary_range[0].split("–")) == 1:
-        min_max_pay = [salary_range[0].split("–")[0], salary_range[0].split("–")[0]]
-        # TO DO: zobaczyc jaki to jest typ w tej liscie min_max_pay
+        min_max_pay = [int(salary_range[0].split("–")[0])]
+        if "godz" in salary_string:
+            min_max_pay[0] = convert_hourly_salary_to_monthly(min_max_pay[0])
         # TO DO: zmienic to na 1 element
     else:
         min_max_pay = [salary_range[0].split("–")[0], salary_range[0].split("–")[1]]
-    if "godz" in salary_string:
-        min_max_pay[0] = convert_hourly_salary_to_monthly(min_max_pay[0])
-        min_max_pay[1] = convert_hourly_salary_to_monthly(min_max_pay[1])
+        if "godz" in salary_string:
+            min_max_pay[0] = convert_hourly_salary_to_monthly(min_max_pay[0])
+            min_max_pay[1] = convert_hourly_salary_to_monthly(min_max_pay[1])
     return min_max_pay
 
 
@@ -57,7 +58,7 @@ def print_data_to_console(jobs_list):
         print(the_job)
         print(f"Tytuł: {the_job['jobTitle']}")
         job_salary = prepare_salary_range(the_job["salaryDisplayText"])
-        print(f"Widełki płacowe: {job_salary[0]}-{job_salary[1]}zł")
+        print(f"Widełki płacowe: {job_salary[0]}-{job_salary[1]}zł" if len(job_salary) == 2 else f"Płaca: {job_salary[0]}zł")
         print("LOKALIZACJA:")
         if not the_job['isRemoteWorkAllowed']:
             print_multiple_workplaces(the_job['offers'])
@@ -76,5 +77,4 @@ current_save = save_and_load_job_data()
 job_offers = current_save[0]
 jobs_found_amount = current_save[1]
 print_data_to_console(job_offers)
-print(jobs_found_amount)
 # TO DO: Pokazać Tobiaszowi ile jest technologii łącznie (najpierw list i set)
