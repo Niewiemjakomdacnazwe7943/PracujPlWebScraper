@@ -26,10 +26,11 @@ programming_languages = {
     "typescript": 0
 }
 work_modes = {
-    "Młodszy specjalista (Junior)": 0,
-    "Specjalista (Mid / Regular)": 0,
-    "Starszy specjalista (Senior)": 0
+    "Praca stacjonarna": 0,
+    "Praca hybrydowa": 0,
+    "Praca zdalna": 0
 }
+
 
 
 def first_connection():
@@ -75,12 +76,12 @@ def prepare_salary_range(salary_text):
     if len(salary_range[0].split("–")) == 1:
         min_max_pay = [int(salary_range[0].split("–")[0])]
         if "godz" in salary_string:
-            min_max_pay[0] = int(convert_hourly_salary_to_monthly(min_max_pay[0]))
-    else:
-        min_max_pay = [int(salary_range[0].split("–")[0]), int(salary_range[0].split("–")[1])]
-        if "godz" in salary_string:
             min_max_pay[0] = convert_hourly_salary_to_monthly(min_max_pay[0])
-            min_max_pay[1] = convert_hourly_salary_to_monthly(min_max_pay[1])
+    else:
+        if "godz" in salary_string:
+            min_max_pay = [convert_hourly_salary_to_monthly(salary_range[0].split("–")[0]), convert_hourly_salary_to_monthly(salary_range[0].split("–")[1])]
+        else:
+            min_max_pay = [int(salary_range[0].split("–")[0]), int(salary_range[0].split("–")[1])]
     return min_max_pay
 
 
@@ -89,6 +90,13 @@ def print_multiple_workplaces(offers_list):
         city_list = offers_list[offer]['displayWorkplace'].replace(" ", "").split(",")
         for city in city_list:
             print(city)
+
+
+def calculate_average_salary(salary_range):
+    if len(salary_range) == 1:
+        return salary_range[0]
+    average_salary = float((salary_range[0] + salary_range[1]) / 2)
+    return average_salary
 
 
 def format_programming_languages(keys, values):
@@ -106,8 +114,8 @@ def print_data_to_console(jobs_list):
         the_job = jobs_list[job_offer]
         print(the_job)
         print(f"Tytuł: {the_job['jobTitle']}")
-        job_salary = prepare_salary_range(the_job["salaryDisplayText"])
-        print(f"Widełki płacowe: {job_salary[0]}-{job_salary[1]}zł" if len(job_salary) == 2 else f"Płaca: {job_salary[0]}zł")
+        salary = prepare_salary_range(the_job["salaryDisplayText"])
+        print(f"Widełki płacowe: {salary[0]}-{salary[1]}zł" if len(salary) == 2 else f"Płaca: {salary[0]}zł")
         print("LOKALIZACJA:")
         if not the_job['isRemoteWorkAllowed']:
             print_multiple_workplaces(the_job['offers'])
@@ -138,7 +146,6 @@ for job in all_job_offers:
             if language in f"{tech.lower() if len(tech) > 2 else f'-{tech}'}":
                 programming_languages[language] += 1
                 break
-    for position in job['positionLevels']:
-        if position != "Ekspert" and position != "Asystent":
-            work_modes[position] += 1
+    for work_mode in job['workModes']:
+        work_modes[work_mode] += 1
 formatted_languages = format_programming_languages(list(programming_languages.keys()),list(programming_languages.values()))
