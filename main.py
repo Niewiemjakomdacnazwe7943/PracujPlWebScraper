@@ -30,15 +30,35 @@ work_modes = {
     "Praca hybrydowa": 0,
     "Praca zdalna": 0
 }
-
+positions = {
+    "administrator": 0,
+    "analityk": 0,
+    "analityk danych": 0,
+    "architekt": 0,
+    "asystent": 0,
+    "audytor": 0,
+    "badacz": 0,
+    "developer": 0,
+    "ekspert": 0,
+    "grafik": 0,
+    "informatyk": 0,
+    "inżynier": 0,
+    "konsultant": 0,
+    "lider": 0,
+    "menadżer": 0,
+    "mistrz": 0,
+    "pmo": 0,
+    "programista": 0,
+    "specjalista": 0,
+    "tester": 0,
+    "właściciel": 0
+}
 
 
 def first_connection():
     current_save = connection(1)
     first_job_offers = current_save[0]
     first_job_offers_amount = current_save[1]
-    with open("dane.json", "w") as data:
-        data.write("")
     return first_job_offers, first_job_offers_amount
 
 
@@ -66,6 +86,13 @@ def save_and_load_job_data(all_job_data):
         return json.load(data)
 
 
+def save_and_load_job_titles(title_list):
+    with open("nazwy prac.txt", "w", encoding="UTF-8") as job_titles:
+        job_titles.write(f"{title_list}")
+    with open("nazwy prac.txt", "r", encoding="UTF-8") as job_titles:
+        return job_titles.read()
+
+
 def convert_hourly_salary_to_monthly(hourly_salary):
     return floor(float(hourly_salary) * 173.3)
 
@@ -74,9 +101,10 @@ def prepare_salary_range(salary_text):
     salary_string = salary_text.replace("\xa0", "").replace(" ", "").replace(",", ".")
     salary_range = salary_string.split("zł")
     if len(salary_range[0].split("–")) == 1:
-        min_max_pay = [int(salary_range[0].split("–")[0])]
         if "godz" in salary_string:
-            min_max_pay[0] = convert_hourly_salary_to_monthly(min_max_pay[0])
+            min_max_pay = [convert_hourly_salary_to_monthly(salary_range[0])]
+        else:
+            min_max_pay = [int(salary_range[0].split("–")[0])]
     else:
         if "godz" in salary_string:
             min_max_pay = [convert_hourly_salary_to_monthly(salary_range[0].split("–")[0]), convert_hourly_salary_to_monthly(salary_range[0].split("–")[1])]
@@ -140,6 +168,8 @@ for i in range(2, pages_found + 1):
     for job in more_job_offers[0]:
         job_offers.append(job)
 all_job_offers = save_and_load_job_data(job_offers)
+job_salaries = []
+job_titles_string = ""
 for job in all_job_offers:
     for tech in job['technologies']:
         for language in programming_languages:
@@ -148,4 +178,12 @@ for job in all_job_offers:
                 break
     for work_mode in job['workModes']:
         work_modes[work_mode] += 1
+    pay_range = prepare_salary_range(job['salaryDisplayText'])
+    job_salaries.append(calculate_average_salary(pay_range))
+    job_titles_string += f"{job['jobTitle']}\n"
+all_job_titles = save_and_load_job_titles(job_titles_string)
+for title in all_job_titles:
+    keyword_list = title.replace("/", " ").split(" ")
+    print(keyword_list)
+
 formatted_languages = format_programming_languages(list(programming_languages.keys()),list(programming_languages.values()))

@@ -2,4 +2,5 @@
 .venv/
 chromedriver.exe
 *.json
+*.txt
 *.env
