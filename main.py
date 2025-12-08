@@ -31,27 +31,21 @@ work_modes = {
     "Praca zdalna": 0
 }
 positions = {
-    "administrator": 0,
-    "analityk": 0,
-    "analityk danych": 0,
-    "architekt": 0,
-    "asystent": 0,
-    "audytor": 0,
-    "badacz": 0,
-    "developer": 0,
-    "ekspert": 0,
-    "grafik": 0,
-    "informatyk": 0,
-    "inżynier": 0,
-    "konsultant": 0,
-    "lider": 0,
-    "menadżer": 0,
-    "mistrz": 0,
-    "pmo": 0,
-    "programista": 0,
-    "specjalista": 0,
-    "tester": 0,
-    "właściciel": 0
+    "administrator": {"translation": "administrator", "count": 0},
+    "analyst": {"translation": "analityk", "count": 0},
+    "data scientist": {"translation": "analityk danych", "count": 0},
+    "architect": {"translation": "architekt", "count": 0},
+    "developer": {"translation": "deweloper", "count": 0},
+    "designer": {"translation": "grafik", "count": 0},
+    "it specialist": {"translation": "informatyk", "count": 0},
+    "engineer": {"translation": "inżynier", "count": 0},
+    "consultant": {"translation": "konsultant", "count": 0},
+    "lead": {"translation": "lider", "count": 0},
+    "manager": {"translation": "menadżer", "count": 0},
+    "programmer": {"translation": "programista", "count": 0},
+    "specialist": {"translation": "specjalista", "count": 0},
+    "tester": {"translation": "tester", "count": 0},
+    "pozostałe": {"translation": "pozostałe", "count": 0}
 }
 
 
@@ -90,7 +84,25 @@ def save_and_load_job_titles(title_list):
     with open("nazwy prac.txt", "w", encoding="UTF-8") as job_titles:
         job_titles.write(f"{title_list}")
     with open("nazwy prac.txt", "r", encoding="UTF-8") as job_titles:
-        return job_titles.read()
+        return job_titles.readlines()
+
+
+def translate_job_title(title_to_translate):
+    fixed_title = title_to_translate.replace("dveloper", "developer").replace("inż.", "inżynier")
+    keywords_list = fixed_title.split(" ")
+    counter = 0
+    for keyword in keywords_list:
+        for position in positions:
+            if keyword == position:
+                keywords_list[counter] = positions[position]['translation']
+                break
+            elif keywords_list[counter] == "data" and keywords_list[counter + 1] == "scientist":
+                positions['data scientist']['count'] += 1
+        counter += 1
+    new_title = ""
+    for keyword in keywords_list:
+        new_title += f"{keyword}\n"
+    return new_title
 
 
 def convert_hourly_salary_to_monthly(hourly_salary):
@@ -182,8 +194,20 @@ for job in all_job_offers:
     job_salaries.append(calculate_average_salary(pay_range))
     job_titles_string += f"{job['jobTitle']}\n"
 all_job_titles = save_and_load_job_titles(job_titles_string)
+all_translated_job_titles = []
 for title in all_job_titles:
-    keyword_list = title.replace("/", " ").split(" ")
-    print(keyword_list)
-
+    prepared_title = title.lower().replace("\n", "").replace("/", " ")
+    all_translated_job_titles.append(translate_job_title(prepared_title))
+for translated_title in all_translated_job_titles:
+    position_found = False
+    split_title = translated_title.split("\n")
+    for cos in split_title:
+        for pos in positions:
+            if cos == positions[pos]['translation']:
+                positions[pos]['count'] += 1
+                position_found = True
+                break
+    if not position_found:
+        positions['pozostałe']['count'] += 1
+print(positions)
 formatted_languages = format_programming_languages(list(programming_languages.keys()),list(programming_languages.values()))
