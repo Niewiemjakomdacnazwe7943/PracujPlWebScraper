@@ -3,50 +3,11 @@ from selenium import webdriver
 from bs4 import BeautifulSoup
 from math import floor, ceil
 
-programming_languages = {
-    ".net": 0,
-    "angular": 0,
-    "aws": 0,
-    "c++": 0,
-    "C#": 0,
-    "-C": 0,
-    "Go": 0,
-    "hibernate": 0,
-    "html": 0,
-    "javascript": 0,
-    "java": 0,
-    "node.js": 0,
-    "python": 0,
-    "php": 0,
-    "react": 0,
-    "ruby": 0,
-    "rust": 0,
-    "-R": 0,
-    "sql": 0,
-    "typescript": 0
-}
-work_modes = {
-    "Praca stacjonarna": 0,
-    "Praca hybrydowa": 0,
-    "Praca zdalna": 0
-}
-positions = {
-    "administrator": {"translation": "administrator", "count": 0},
-    "analyst": {"translation": "analityk", "count": 0},
-    "data scientist": {"translation": "analityk danych", "count": 0},
-    "architect": {"translation": "architekt", "count": 0},
-    "developer": {"translation": "deweloper", "count": 0},
-    "designer": {"translation": "grafik", "count": 0},
-    "it specialist": {"translation": "informatyk", "count": 0},
-    "engineer": {"translation": "inżynier", "count": 0},
-    "consultant": {"translation": "konsultant", "count": 0},
-    "lead": {"translation": "lider", "count": 0},
-    "manager": {"translation": "menadżer", "count": 0},
-    "programmer": {"translation": "programista", "count": 0},
-    "specialist": {"translation": "specjalista", "count": 0},
-    "tester": {"translation": "tester", "count": 0},
-    "pozostałe": {"translation": "pozostałe", "count": 0}
-}
+
+def load_gathering_data():
+    with open("gathering_data.json", "r", encoding="UTF-8") as my_data:
+        gathering_data = json.load(my_data)
+        return gathering_data
 
 
 def first_connection():
@@ -61,7 +22,7 @@ def find_pages_amount(amount_of_offers):
 
 
 def connection(page_number):
-    website_link = f'https://it.pracuj.pl/praca?et=17,4,18,&sal=1&pn={page_number}&sc=0&wm=home-office,full-office,hybrid'
+    website_link = f'https://it.pracuj.pl/praca?et=4,17,18,&sal=1&pn={page_number}&sc=0&wm=home-office,full-office,hybrid'
     chrome_driver = webdriver.Chrome()
     chrome_driver.get(website_link)
     website_soup = BeautifulSoup(chrome_driver.page_source, "html.parser")
@@ -74,22 +35,23 @@ def connection(page_number):
 
 
 def save_and_load_job_data(all_job_data):
-    with open("dane.json", "w") as data:
+    with open("job_data.json", "w", encoding="UTF-8") as data:
         data.write(json.dumps(all_job_data, indent=1))
-    with open("dane.json", "r") as data:
+    with open("job_data.json", "r") as data:
         return json.load(data)
 
 
 def save_and_load_job_titles(title_list):
-    with open("nazwy prac.txt", "w", encoding="UTF-8") as job_titles:
+    with open("job_titles.txt", "w", encoding="UTF-8") as job_titles:
         job_titles.write(f"{title_list}")
-    with open("nazwy prac.txt", "r", encoding="UTF-8") as job_titles:
+    with open("job_titles.txt", "r", encoding="UTF-8") as job_titles:
         return job_titles.readlines()
 
 
 def translate_job_title(title_to_translate):
     fixed_title = title_to_translate.replace("dveloper", "developer").replace("inż.", "inżynier")
-    keywords_list = fixed_title.split(" ")
+    prepared_title = fixed_title.lower().replace("\n", "").replace("/", " ")
+    keywords_list = prepared_title.split(" ")
     counter = 0
     for keyword in keywords_list:
         for position in positions:
@@ -139,6 +101,20 @@ def calculate_average_salary(salary_range):
     return average_salary
 
 
+def detect_programming_language(your_language_dict, technology_string, lang):
+    if lang in f"{technology_string.lower() if len(technology_string) > 2 else f'-{technology_string}'}":
+        your_language_dict[lang] += 1
+        return True
+    else:
+        return False
+
+
+def calculate_average_position_salary(position_and_salary_dict):
+    average_salary_dict = {}
+    for pos in position_and_salary_dict:
+        average_salary_dict[pos] = round((position_and_salary_dict[pos]['salary sum'] / position_and_salary_dict[pos]['count']))
+    return average_salary_dict
+
 def format_programming_languages(keys, values):
     new_languages = {}
     for j in range(len(keys)):
@@ -169,7 +145,11 @@ def print_data_to_console(jobs_list):
             print(the_job['positionLevels'][pos])
         print()
 
-
+data_to_gather = load_gathering_data()
+programming_languages = data_to_gather['programming languages']
+work_modes = data_to_gather['work modes']
+positions = data_to_gather['positions']
+positions_and_salaries = data_to_gather['positions and salaries']
 job_data = first_connection()
 job_offers = job_data[0]
 job_offers_amount = job_data[1]
@@ -180,34 +160,38 @@ for i in range(2, pages_found + 1):
     for job in more_job_offers[0]:
         job_offers.append(job)
 all_job_offers = save_and_load_job_data(job_offers)
-job_salaries = []
 job_titles_string = ""
 for job in all_job_offers:
+    job_title = job['jobTitle']
+    if "AI" in job_title or "ML" in job_title or "Machine Learning" in job_title or "LLM" in job_title:
+        print(f"{job['jobTitle']} - {job_title}")
     for tech in job['technologies']:
         for language in programming_languages:
-            if language in f"{tech.lower() if len(tech) > 2 else f'-{tech}'}":
-                programming_languages[language] += 1
+            if detect_programming_language(programming_languages, tech, language):
                 break
     for work_mode in job['workModes']:
         work_modes[work_mode] += 1
     pay_range = prepare_salary_range(job['salaryDisplayText'])
-    job_salaries.append(calculate_average_salary(pay_range))
+    for position in job['positionLevels']:
+        if position != "Ekspert" and position != "Asystent":
+            positions_and_salaries[position]['count'] += 1
+            positions_and_salaries[position]['salary sum'] += calculate_average_salary(pay_range)
     job_titles_string += f"{job['jobTitle']}\n"
 all_job_titles = save_and_load_job_titles(job_titles_string)
+average_salaries_per_position = calculate_average_position_salary(positions_and_salaries)
+print(average_salaries_per_position)
 all_translated_job_titles = []
 for title in all_job_titles:
-    prepared_title = title.lower().replace("\n", "").replace("/", " ")
-    all_translated_job_titles.append(translate_job_title(prepared_title))
+    all_translated_job_titles.append(translate_job_title(title))
 for translated_title in all_translated_job_titles:
     position_found = False
     split_title = translated_title.split("\n")
-    for cos in split_title:
-        for pos in positions:
-            if cos == positions[pos]['translation']:
-                positions[pos]['count'] += 1
+    for title_fragment in split_title:
+        for position in positions:
+            if title_fragment == positions[position]['translation']:
+                positions[position]['count'] += 1
                 position_found = True
                 break
     if not position_found:
         positions['pozostałe']['count'] += 1
-print(positions)
-formatted_languages = format_programming_languages(list(programming_languages.keys()),list(programming_languages.values()))
+formatted_languages = format_programming_languages(list(programming_languages.keys()), list(programming_languages.values()))
