@@ -125,6 +125,18 @@ def format_programming_languages(keys, values):
     return new_languages
 
 
+def find_ai_related_jobs(ai_title):
+    with open("gathering_data.json", "r") as ai_data:
+        ai_keywords = json.load(ai_data)["AI keywords"]
+    split_ai_title = ai_title.split(" ")
+    for counter in range(len(split_ai_title)):
+        for keyword in ai_keywords:
+            if keyword == split_ai_title[counter] or (split_ai_title[counter] == "Machine" and split_ai_title[counter + 1] == "Learning"):
+                return True
+    return False
+
+
+
 def print_data_to_console(jobs_list):
     for job_offer in range(len(jobs_list)):
         the_job = jobs_list[job_offer]
@@ -161,10 +173,11 @@ for i in range(2, pages_found + 1):
         job_offers.append(job)
 all_job_offers = save_and_load_job_data(job_offers)
 job_titles_string = ""
+ai_related_jobs_amount = 0
 for job in all_job_offers:
     job_title = job['jobTitle']
-    if "AI" in job_title or "ML" in job_title or "Machine Learning" in job_title or "LLM" in job_title:
-        print(f"{job['jobTitle']} - {job_title}")
+    if find_ai_related_jobs(job_title):
+        ai_related_jobs_amount += 1
     for tech in job['technologies']:
         for language in programming_languages:
             if detect_programming_language(programming_languages, tech, language):
@@ -179,7 +192,6 @@ for job in all_job_offers:
     job_titles_string += f"{job['jobTitle']}\n"
 all_job_titles = save_and_load_job_titles(job_titles_string)
 average_salaries_per_position = calculate_average_position_salary(positions_and_salaries)
-print(average_salaries_per_position)
 all_translated_job_titles = []
 for title in all_job_titles:
     all_translated_job_titles.append(translate_job_title(title))
@@ -195,3 +207,12 @@ for translated_title in all_translated_job_titles:
     if not position_found:
         positions['pozostałe']['count'] += 1
 formatted_languages = format_programming_languages(list(programming_languages.keys()), list(programming_languages.values()))
+ai_jobs_percentage = f"{ai_related_jobs_amount / job_offers_amount * 100:.2f}%"
+print(ai_jobs_percentage)
+work_modes_sum = 0
+for work_mode in work_modes:
+    work_modes_sum += work_modes[work_mode]
+work_modes_percentage = {}
+for work_mode in work_modes:
+    work_modes_percentage[work_mode] = f"{(work_modes[work_mode] * 100) / work_modes_sum:.2f}%"
+print(work_modes_percentage)
