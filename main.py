@@ -10,8 +10,8 @@ def load_gathering_data():
         return gathering_data
 
 
-def first_connection():
-    current_save = connection(1)
+def first_connection(ai_ml_link=""):
+    current_save = connection(1, ai_ml_link)
     first_job_offers = current_save[0]
     first_job_offers_amount = current_save[1]
     return first_job_offers, first_job_offers_amount
@@ -21,8 +21,8 @@ def find_pages_amount(amount_of_offers):
     return ceil(amount_of_offers / 50)
 
 
-def connection(page_number):
-    website_link = f'https://it.pracuj.pl/praca?et=4,17,18,&sal=1&pn={page_number}&sc=0&wm=home-office,full-office,hybrid'
+def connection(page_number, ai_ml_link=""):
+    website_link = f'https://it.pracuj.pl/praca?et=4,17,18,&sal=1&pn={page_number}&sc=0&wm=home-office,full-office,hybrid&its={ai_ml_link}'
     chrome_driver = webdriver.Chrome()
     chrome_driver.get(website_link)
     website_soup = BeautifulSoup(chrome_driver.page_source, "html.parser")
@@ -54,9 +54,9 @@ def translate_job_title(title_to_translate):
     keywords_list = prepared_title.split(" ")
     counter = 0
     for keyword in keywords_list:
-        for position in positions:
-            if keyword == position:
-                keywords_list[counter] = positions[position]['translation']
+        for position_2 in positions:
+            if keyword == position_2:
+                keywords_list[counter] = positions[position_2]['translation']
                 break
             elif keywords_list[counter] == "data" and keywords_list[counter + 1] == "scientist":
                 positions['data scientist']['count'] += 1
@@ -115,6 +115,7 @@ def calculate_average_position_salary(position_and_salary_dict):
         average_salary_dict[pos] = round((position_and_salary_dict[pos]['salary sum'] / position_and_salary_dict[pos]['count']))
     return average_salary_dict
 
+
 def format_programming_languages(keys, values):
     new_languages = {}
     for j in range(len(keys)):
@@ -125,16 +126,16 @@ def format_programming_languages(keys, values):
     return new_languages
 
 
-def find_ai_related_jobs(ai_title):
-    with open("gathering_data.json", "r") as ai_data:
-        ai_keywords = json.load(ai_data)["AI keywords"]
-    split_ai_title = ai_title.split(" ")
-    for counter in range(len(split_ai_title)):
-        for keyword in ai_keywords:
-            if keyword == split_ai_title[counter] or (split_ai_title[counter] == "Machine" and split_ai_title[counter + 1] == "Learning"):
-                return True
-    return False
-
+def find_ai_related_jobs():
+    custom_connection = first_connection("ai-ml")
+    ai_offers_amount = custom_connection[1]
+    ai_offers = custom_connection[0]
+    ai_offers_pages = find_pages_amount(ai_offers_amount)
+    for j in range(2, ai_offers_pages + 1):
+        more_ai_offers = connection(j, "ai-ml")
+        for ai_job in more_ai_offers[0]:
+            ai_offers.append(ai_job)
+    return ai_offers
 
 
 def print_data_to_console(jobs_list):
@@ -157,44 +158,53 @@ def print_data_to_console(jobs_list):
             print(the_job['positionLevels'][pos])
         print()
 
+
 data_to_gather = load_gathering_data()
 programming_languages = data_to_gather['programming languages']
 work_modes = data_to_gather['work modes']
 positions = data_to_gather['positions']
 positions_and_salaries = data_to_gather['positions and salaries']
+
 job_data = first_connection()
 job_offers = job_data[0]
 job_offers_amount = job_data[1]
+
 # print_data_to_console(job_offers)
 pages_found = find_pages_amount(job_offers_amount)
 for i in range(2, pages_found + 1):
     more_job_offers = connection(i)
     for job in more_job_offers[0]:
         job_offers.append(job)
+
 all_job_offers = save_and_load_job_data(job_offers)
 job_titles_string = ""
-ai_related_jobs_amount = 0
+ai_related_jobs_amount = find_ai_related_jobs()
+
 for job in all_job_offers:
     job_title = job['jobTitle']
-    if find_ai_related_jobs(job_title):
-        ai_related_jobs_amount += 1
     for tech in job['technologies']:
         for language in programming_languages:
             if detect_programming_language(programming_languages, tech, language):
                 break
+    formatted_languages = format_programming_languages(list(programming_languages.keys()), list(programming_languages.values()))
+
     for work_mode in job['workModes']:
         work_modes[work_mode] += 1
+
     pay_range = prepare_salary_range(job['salaryDisplayText'])
     for position in job['positionLevels']:
         if position != "Ekspert" and position != "Asystent":
             positions_and_salaries[position]['count'] += 1
             positions_and_salaries[position]['salary sum'] += calculate_average_salary(pay_range)
     job_titles_string += f"{job['jobTitle']}\n"
+
 all_job_titles = save_and_load_job_titles(job_titles_string)
 average_salaries_per_position = calculate_average_position_salary(positions_and_salaries)
 all_translated_job_titles = []
+
 for title in all_job_titles:
     all_translated_job_titles.append(translate_job_title(title))
+
 for translated_title in all_translated_job_titles:
     position_found = False
     split_title = translated_title.split("\n")
@@ -206,13 +216,14 @@ for translated_title in all_translated_job_titles:
                 break
     if not position_found:
         positions['pozostałe']['count'] += 1
-formatted_languages = format_programming_languages(list(programming_languages.keys()), list(programming_languages.values()))
-ai_jobs_percentage = f"{ai_related_jobs_amount / job_offers_amount * 100:.2f}%"
-print(ai_jobs_percentage)
+
+ai_jobs_percentage = float(f"{len(ai_related_jobs_amount) / job_offers_amount * 100:.2f}")
 work_modes_sum = 0
+
 for work_mode in work_modes:
     work_modes_sum += work_modes[work_mode]
+
 work_modes_percentage = {}
+
 for work_mode in work_modes:
-    work_modes_percentage[work_mode] = f"{(work_modes[work_mode] * 100) / work_modes_sum:.2f}%"
-print(work_modes_percentage)
+    work_modes_percentage[work_mode] = float(f"{(work_modes[work_mode] * 100) / work_modes_sum:.2f}")
