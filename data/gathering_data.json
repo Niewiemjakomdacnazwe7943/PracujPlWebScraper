@@ -1,0 +1,51 @@
+{
+    "programming languages": {
+    	".net": 0,
+    	"angular": 0,
+    	"aws": 0,
+    	"c++": 0,
+    	"C#": 0,
+    	"-C": 0,
+    	"Go": 0,
+    	"hibernate": 0,
+    	"html": 0,
+    	"javascript": 0,
+    	"java": 0,
+    	"node.js": 0,
+    	"python": 0,
+    	"php": 0,
+    	"react": 0,
+    	"ruby": 0,
+    	"rust": 0,
+    	"-R": 0,
+    	"sql": 0,
+    	"typescript": 0
+},
+    "work modes": {
+    	"Praca stacjonarna": 0,
+    	"Praca hybrydowa": 0,
+    	"Praca zdalna": 0
+},
+    "positions": {
+    	"administrator": {"translation": "administrator", "count": 0},
+    	"analyst": {"translation": "analityk", "count": 0},
+    	"data scientist": {"translation": "analityk danych", "count": 0},
+    	"architect": {"translation": "architekt", "count": 0},
+    	"developer": {"translation": "deweloper", "count": 0},
+    	"designer": {"translation": "grafik", "count": 0},
+    	"it specialist": {"translation": "informatyk", "count": 0},
+    	"engineer": {"translation": "inżynier", "count": 0},
+    	"consultant": {"translation": "konsultant", "count": 0},
+    	"lead": {"translation": "lider", "count": 0},
+    	"manager": {"translation": "menadżer", "count": 0},
+    	"programmer": {"translation": "programista", "count": 0},
+    	"specialist": {"translation": "specjalista", "count": 0},
+    	"tester": {"translation": "tester", "count": 0},
+    	"pozostałe": {"translation": "pozostałe", "count": 0}
+},
+    "positions and salaries": {
+	"Młodszy specjalista (Junior)": {"count": 0, "salary sum": 0},
+	"Specjalista (Mid / Regular)": {"count": 0, "salary sum": 0},
+	"Starszy specjalista (Senior)": {"count": 0, "salary sum": 0}
+}
+}

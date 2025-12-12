@@ -1,7 +1,8 @@
 .idea/
 .venv/
 chromedriver.exe
-*.json
+data/analysis_data.json
+data/job_data.json
 *.txt
 *.env
 data/__pycache__
