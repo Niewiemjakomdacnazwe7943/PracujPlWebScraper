@@ -27,6 +27,7 @@
     	"Praca zdalna": 0
 },
     "positions": {
+    	"pozostałe": {"translation": "pozostałe", "count": 0},
     	"administrator": {"translation": "administrator", "count": 0},
     	"analyst": {"translation": "analityk", "count": 0},
     	"data scientist": {"translation": "analityk danych", "count": 0},
@@ -40,12 +41,11 @@
     	"manager": {"translation": "menadżer", "count": 0},
     	"programmer": {"translation": "programista", "count": 0},
     	"specialist": {"translation": "specjalista", "count": 0},
-    	"tester": {"translation": "tester", "count": 0},
-    	"pozostałe": {"translation": "pozostałe", "count": 0}
+    	"tester": {"translation": "tester", "count": 0}
 },
     "positions and salaries": {
-	"Młodszy specjalista (Junior)": {"count": 0, "salary sum": 0},
-	"Specjalista (Mid / Regular)": {"count": 0, "salary sum": 0},
-	"Starszy specjalista (Senior)": {"count": 0, "salary sum": 0}
+	"Junior": {"count": 0, "salary sum": 0},
+	"Mid/Regular": {"count": 0, "salary sum": 0},
+	"Senior": {"count": 0, "salary sum": 0}
 }
 }

@@ -12,11 +12,7 @@ def load_gathering_data():
 
 def export_analysis_data(data_to_export):
     with open("data/analysis_data.json", "w", encoding="UTF-8") as my_data:
-        my_data.write("[\n")
-        for item in data_to_export:
-            my_data.write(f"{item},\n")
-        my_data.write("]")
-
+        my_data.write(json.dumps(data_to_export, indent=1))
 
 
 def first_connection(ai_ml_link=False):
@@ -37,6 +33,7 @@ def connection(page_number, ai_ml_link=False):
     website_link = f'https://it.pracuj.pl/praca?et=4,17,18,&sal=1&pn={page_number}&sc=0&wm=home-office,full-office,hybrid{ai_parameter}'
     chrome_driver = webdriver.Chrome()
     chrome_driver.get(website_link)
+    print(chrome_driver.page_source)
     website_soup = BeautifulSoup(chrome_driver.page_source, "html.parser")
     website_script = website_soup.find("script", {"id": "__NEXT_DATA__", "type": "application/json"}).text
     chrome_driver.quit()
@@ -205,8 +202,9 @@ for job in all_job_offers:
     pay_range = prepare_salary_range(job['salaryDisplayText'])
     for position in job['positionLevels']:
         if position != "Ekspert" and position != "Asystent":
-            positions_and_salaries[position]['count'] += 1
-            positions_and_salaries[position]['salary sum'] += calculate_average_salary(pay_range)
+            prepared_position = position.replace(" ", "").split("(")[1].replace(")", "")
+            positions_and_salaries[prepared_position]['count'] += 1
+            positions_and_salaries[prepared_position]['salary sum'] += calculate_average_salary(pay_range)
     job_titles_string += f"{job['jobTitle']}\n"
 
 all_job_titles = save_and_load_job_titles(job_titles_string)
@@ -229,11 +227,10 @@ for translated_title in all_translated_job_titles:
                 break
     if not position_found:
         positions['pozostałe']['count'] += 1
-
 ai_jobs_percentage = float(f"{len(ai_related_jobs_amount) / job_offers_amount * 100:.2f}")
 work_modes_sum = 0
 
 for work_mode in work_modes:
     work_modes_sum += work_modes[work_mode]
 
-export_analysis_data([formatted_languages,work_modes,positions,ai_jobs_percentage])
+export_analysis_data([formatted_languages,work_modes,positions,ai_jobs_percentage, average_salaries_per_position])
