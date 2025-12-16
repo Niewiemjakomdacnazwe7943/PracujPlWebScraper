@@ -33,10 +33,14 @@ def connection(page_number, ai_ml_link=False):
     website_link = f'https://it.pracuj.pl/praca?et=4,17,18,&sal=1&pn={page_number}&sc=0&wm=home-office,full-office,hybrid{ai_parameter}'
     chrome_driver = webdriver.Chrome()
     chrome_driver.get(website_link)
-    print(chrome_driver.page_source)
-    website_soup = BeautifulSoup(chrome_driver.page_source, "html.parser")
-    website_script = website_soup.find("script", {"id": "__NEXT_DATA__", "type": "application/json"}).text
-    chrome_driver.quit()
+    try:
+        website_soup = BeautifulSoup(chrome_driver.page_source, "html.parser")
+        website_script = website_soup.find("script", {"id": "__NEXT_DATA__", "type": "application/json"}).text
+        chrome_driver.quit()
+    except Exception as e:
+        print(chrome_driver.page_source)
+        print(e)
+        exit(1)
     website_json = json.loads(website_script)
     page_job_offers = website_json['props']['pageProps']['dehydratedState']['queries'][0]['state']['data']['groupedOffers']
     jobs_found_amount = website_json['props']['pageProps']['dehydratedState']['queries'][0]['state']['data']['groupedOffersTotalCount']
