@@ -1,6 +1,5 @@
 .idea/
 .venv/
-chromedriver.exe
 data/analysis_data.json
 data/job_data.json
 *.txt

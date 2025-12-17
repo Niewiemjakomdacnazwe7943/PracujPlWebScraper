@@ -1,5 +1,3 @@
-import subprocess
-import sys
 from data import data_program
 import streamlit as st
 import json
