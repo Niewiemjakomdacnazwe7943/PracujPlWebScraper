@@ -1,12 +1,12 @@
-from data import data_program
 import streamlit as st
-import json
-import matplotlib.pyplot as plt
-
 st.set_page_config(
     page_title="Analiza rynku pracy",
     page_icon="https://uisystem.gpcdn.pl/root/icon/pracuj/1.0.0/basic.ico",
 )
+st.title("Analiza rynku pracy na Pracuj.pl", text_alignment="center")
+from data import data_program
+import json
+import matplotlib.pyplot as plt
 def load_analysis_data():
     with open("data/analysis_data.json") as data_file:
         data = json.load(data_file)
@@ -82,7 +82,6 @@ work_modes = analysis_data[1]
 positions = analysis_data[2]
 ai_jobs_percentage = analysis_data[3]
 average_position_salaries = analysis_data[4]
-st.title("Analiza rynku pracy na Pracuj.pl", text_alignment="center")
 with st.container(border=True):
     cell1, cell2 = st.columns(2, gap="medium")
     with cell1:

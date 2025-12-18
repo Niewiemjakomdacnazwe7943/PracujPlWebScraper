@@ -2,6 +2,7 @@ import json
 from selenium import webdriver
 from bs4 import BeautifulSoup
 from math import floor, ceil
+from time import sleep
 
 
 def load_gathering_data():
@@ -33,6 +34,7 @@ def connection(page_number, ai_ml_link=False):
     website_link = f'https://it.pracuj.pl/praca?et=4,17,18,&sal=1&pn={page_number}&sc=0&wm=home-office,full-office,hybrid{ai_parameter}'
     chrome_driver = webdriver.Chrome()
     chrome_driver.get(website_link)
+    sleep(1)
     try:
         website_soup = BeautifulSoup(chrome_driver.page_source, "html.parser")
         website_script = website_soup.find("script", {"id": "__NEXT_DATA__", "type": "application/json"}).text
