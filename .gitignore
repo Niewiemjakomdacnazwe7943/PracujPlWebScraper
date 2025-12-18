@@ -2,6 +2,6 @@
 .venv/
 data/analysis_data.json
 data/job_data.json
-*.txt
+data/job_titles.txt
 *.env
 data/__pycache__
