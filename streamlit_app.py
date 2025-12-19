@@ -44,17 +44,17 @@ def graph_languages(data):
     plt.title("Najbardziej poszukiwane języki programowania", fontsize=30)
     plt.barh(data['labels'], data['values'], edgecolor="black", lw=0.1, color="darkgreen")
     plt.tick_params(axis="both", labelsize=28)
-    plt.xlabel("Amount of job offers", fontsize=30)
-    plt.ylabel("Programming language", fontsize=30)
+    plt.xlabel("Ilość ofert pracy", fontsize=30)
+    plt.ylabel("Język programowania", fontsize=30)
 
 
 def graph_positions(data):
     plt.title("Najbardziej poszukiwane stanowiska", fontsize=8)
     plt.barh(data['labels'], data['values'], color="blue", edgecolor="black", lw=0.2)
     plt.tick_params(axis="both", labelsize=5)
-    plt.xlabel("Amount of job offers", fontsize=7)
+    plt.xlabel("Ilość ofert pracy", fontsize=7)
     plt.xticks([0,100,200,300,400])
-    plt.ylabel("Position", fontsize=7)
+    plt.ylabel("Stanowisko", fontsize=7)
 
 
 def graph_average_salary(data):
