@@ -83,24 +83,29 @@ ai_jobs_percentage = analysis_data[3]
 average_position_salaries = analysis_data[4]
 with st.container(border=True):
     cell1, cell2 = st.columns(2, gap="medium")
+
     with cell1:
         fig, ax = plt.subplots(figsize=(40, 40))
         graph_work_modes(work_modes)
         st.pyplot(fig)
+
     with cell2:
         fig, ax = plt.subplots(figsize=(10, 10))
         graph_languages(programming_languages)
         st.pyplot(fig)
     cell3, cell4 = st.columns([8,1])
+
     with cell3:
         fig, ax = plt.subplots(figsize=(2,2))
         graph_positions(positions)
         st.pyplot(fig)
     cell5, cell6 = st.columns(2)
+
     with cell5:
         fig, ax = plt.subplots()
         graph_average_salary(average_position_salaries)
         st.pyplot(fig)
+
     with cell6:
         fig, ax = plt.subplots(figsize=(5,5))
         graph_ai_jobs(ai_jobs_percentage)
